@@ -4,8 +4,10 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import om.github.buerxixi.easydcom.pojo.EventMessage;
 
 public class EventBus {
-    // 所有消息队列
-    public static final PublishSubject<String> publish = PublishSubject.create();
+    // 通知类报文
+    public static final PublishSubject<String> noticePublish = PublishSubject.create();
+    // 响应类报文
+    public static final PublishSubject<String> respPublish = PublishSubject.create();
     // 事件
     public static final PublishSubject<EventMessage> eventPublish = PublishSubject.create();
 }

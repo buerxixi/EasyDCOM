@@ -1,7 +1,6 @@
 package om.github.buerxixi.easydcom.service;
 
 import io.reactivex.rxjava3.disposables.Disposable;
-import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import om.github.buerxixi.easydcom.exception.DCOMException;
 import om.github.buerxixi.easydcom.service.impl.ClientServiceImpl;
@@ -14,6 +13,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 /**
+ * 转换类
+ *
  * @author <a href="mailto:liujiaqiang@outlook.com">Liujiaqiang</a>
  * @since 2025/04/02 16:58
  */
@@ -24,7 +25,7 @@ public class DcomServiceFuture {
     private static Consumer<String> consumer = null;
 
     static {
-        EventBus.publish.subscribe(s -> {
+        EventBus.noticePublish.subscribe(s -> {
             if (consumer != null) {
                 consumer.accept(s);
             }
@@ -52,7 +53,13 @@ public class DcomServiceFuture {
             }
         });
 
-        clientService.connect(host, port);
+        try {
+            clientService.connect(host, port);
+        } catch (Exception e) {
+            log.error("Failed to connect to DCOM", e);
+            throw new DCOMException(e.getMessage());
+        }
+
         try {
             future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
@@ -65,7 +72,7 @@ public class DcomServiceFuture {
 
     /**
      * 发送业务报文
-     *
+     * TODO:如果登录失败应该调佣close 此处需要业务侧来处理
      * @param message 业务报文
      */
     public static String send(String message) {
@@ -73,8 +80,21 @@ public class DcomServiceFuture {
             throw new DCOMException("DCOM service is not connected");
             // 连接已建立
         }
+        CompletableFuture<String> future = new CompletableFuture<>();
+        Disposable disposable = EventBus.respPublish.subscribe(s -> {
+                future.complete(s);
+        });
+
         clientService.send(message);
-        return null;
+
+        try {
+            return future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            // 取消订阅
+            disposable.dispose();
+        }
     }
 
     /**
