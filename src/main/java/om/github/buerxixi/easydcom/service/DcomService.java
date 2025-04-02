@@ -24,6 +24,8 @@ public class DcomService {
 
         // 连接不会报错
         DcomServiceFuture.connect(host, port);
+
+        // 发送报文
         return null;
     }
 
