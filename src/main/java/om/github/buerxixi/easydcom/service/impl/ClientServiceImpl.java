@@ -61,9 +61,11 @@ public class ClientServiceImpl implements IClientService {
                     // 同步等待连接成功
                     .sync().channel();
             // 等待关闭
-            channel.closeFuture().addListener(future -> {
-                group.shutdownGracefully();
-            });
+            // 原代码：channel.closeFuture().addListener(future -> {
+            //             group.shutdownGracefully();
+            //         });
+            // 修改后：
+            channel.closeFuture().addListener(future -> group.shutdownGracefully());
         } catch (InterruptedException e) {
             log.error("连接失败", e);
         }
