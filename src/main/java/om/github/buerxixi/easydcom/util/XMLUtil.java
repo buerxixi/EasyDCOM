@@ -31,10 +31,8 @@ public class XMLUtil {
     }
 
     public static String parse2text(String xml, String xpathExpression) {
-        if (parse2Optional(xml, xpathExpression).isPresent()) {
-            return parse2Optional(xml, xpathExpression).get();
-        }
-        return "";
+        Optional<String> soptional = parse2Optional(xml, xpathExpression);
+        return soptional.orElse("");
     }
 
     /**

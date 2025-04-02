@@ -12,9 +12,10 @@ import java.util.function.Consumer;
  */
 public class DcomService {
 
+
     /**
      * 连接
-     *
+     * TODO:用户信息 Service端
      * @param host    主机
      * @param port    端口
      * @param message 发送登录报文
