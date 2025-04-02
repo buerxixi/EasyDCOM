@@ -16,17 +16,32 @@ import om.github.buerxixi.easydcom.hander.MessageEncoder;
 import om.github.buerxixi.easydcom.hander.ProtocolFrameDecoder;
 import om.github.buerxixi.easydcom.util.XMLUtil;
 import org.junit.Test;
-
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class SocketServiceTests {
+    // 定义登录响应的 XML 模板
+    private static final String LOGIN_RESP_TEMPLATE;
+    // 定义登出响应的 XML 模板
+    private static final String LOGOUT_RESP_TEMPLATE;
+
+    static {
+        try {
+            // 读取登录响应 XML 文件内容
+            LOGIN_RESP_TEMPLATE = new String(Files.readAllBytes(Paths.get(
+                    SocketServiceTests.class.getClassLoader().getResource("login_resp_template.xml").toURI())), StandardCharsets.UTF_8);
+            // 读取登出响应 XML 文件内容
+            LOGOUT_RESP_TEMPLATE = new String(Files.readAllBytes(Paths.get(
+                    SocketServiceTests.class.getClassLoader().getResource("logout_resp_template.xml").toURI())), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load response templates", e);
+        }
+    }
 
     @Test
     public void run() {
-
-
         NioEventLoopGroup boss = new NioEventLoopGroup();
         NioEventLoopGroup worker = new NioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -43,11 +58,9 @@ public class SocketServiceTests {
                     ch.pipeline().addLast(new MessageEncoder());
                     // 异常和close
                     ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
-
                         // 当连接断开时触发 inactive 事件
                         @Override
                         public void channelInactive(ChannelHandlerContext ctx) {
-
                             // channel断开
                             System.out.println("channel断开" + ctx.channel());
                         }
@@ -65,80 +78,22 @@ public class SocketServiceTests {
                         protected void channelRead0(ChannelHandlerContext ctx, String s) {
                             System.out.println(s);
                             Optional<String> s1 = XMLUtil.parse2Optional(s, "//BizMsgIdr");
-
-
-                            // 判断业务类型
-                            String loginResp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                    "<Msg>\n" +
-                                    "<AppHdr>\n" +
-                                    "<CharSet>UTF-8</CharSet>\n" +
-                                    "<Fr>\n" +
-                                    "<AppIdr>DCOMNW</AppIdr>\n" +
-                                    "<UsrIdr>CSDCSZ</UsrIdr>\n" +
-                                    "</Fr>\n" +
-                                    "<To>\n" +
-                                    "<AppIdr>TEST</AppIdr>\n" +
-                                    "<UsrIdr>ZJB0001</UsrIdr>\n" +
-                                    "</To>\n" +
-                                    "<BizMsgIdr>M20150813LIRP00000000001</BizMsgIdr>\n" +
-                                    "<MsgDefIdr>V2.0</MsgDefIdr>\n" +
-                                    "<BizSvc>LIRP</BizSvc>\n" +
-                                    "<CreDt>2015-08-13T12:00:34</CreDt>\n" +
-                                    "<Rltd>XXXX</Rltd>\n" +
-                                    "</AppHdr>\n" +
-                                    "<Document>\n" +
-                                    "<UserName>TEST</UserName>\n" +
-                                    "<VldtRst>0000</VldtRst>\n" +
-                                    "<Desc>处理成功</Desc>\n" +
-                                    "</Document>\n" +
-                                    "</Msg>";
-
-
-                            String logoutResp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                    "<Msg>\n" +
-                                    "<AppHdr>\n" +
-                                    "<CharSet>UTF-8</CharSet>\n" +
-                                    "<Fr>\n" +
-                                    "<AppIdr>DCOMNW</AppIdr>\n" +
-                                    "<UsrIdr>CSDCSZ</UsrIdr>\n" +
-                                    "</Fr>\n" +
-                                    "<To>\n" +
-                                    "<AppIdr>TEST</AppIdr>\n" +
-                                    "<UsrIdr>ZJB0001</UsrIdr>\n" +
-                                    "</To>\n" +
-                                    "<BizMsgIdr>M20150813LORP00000000035</BizMsgIdr>\n" +
-                                    "<MsgDefIdr>V2.0</MsgDefIdr>\n" +
-                                    "<BizSvc>LORP</BizSvc>\n" +
-                                    "<CreDt>2015-08-13T13:43:14</CreDt>\n" +
-                                    "<Rltd>XXXX</Rltd>\n" +
-                                    "</AppHdr>\n" +
-                                    "<Document>\n" +
-                                    "<UserName>TEST</UserName>\n" +
-                                    "<VldtRst>0000</VldtRst>\n" +
-                                    "<Desc>处理成功</Desc>\n" +
-                                    "</Document>\n" +
-                                    "</Msg>";
-
-
                             Optional<String> bizSvc = XMLUtil.parse2Optional(s, "//BizSvc");
-                            if (bizSvc.isPresent()) {
-                                if (bizSvc.get().equals("LIRQ")) {
 
-                                    String bizMsgIdr = s1.get();
-                                    ctx.channel().writeAndFlush(loginResp.replace("XXXX", bizMsgIdr));
-                                    return;
+                            bizSvc.ifPresent(service -> {
+                                String bizMsgIdr = s1.orElse("");
+                                switch (service) {
+                                    case "LIRQ":
+                                        ctx.channel().writeAndFlush(LOGIN_RESP_TEMPLATE.replace("XXXX", bizMsgIdr));
+                                        break;
+                                    case "LORQ":
+                                        ctx.channel().writeAndFlush(LOGOUT_RESP_TEMPLATE.replace("XXXX", bizMsgIdr));
+                                        break;
+                                    default:
+                                        s1.ifPresent(value -> ctx.channel().writeAndFlush("<Msg><BizSvc>LIRP</BizSvc><Rltd>" + value + "</Rltd></Msg>"));
+                                        break;
                                 }
-
-                                if (bizSvc.get().equals("LORQ")) {
-                                    String bizMsgIdr = s1.get();
-                                    ctx.channel().writeAndFlush(logoutResp.replace("XXXX", bizMsgIdr));
-                                    return;
-                                }
-                            }
-
-
-                            // 登录 发送数据
-                            s1.ifPresent(value -> ctx.channel().writeAndFlush("<Msg><BizSvc>LIRP</BizSvc><Rltd>" + value + "</Rltd></Msg>"));
+                            });
                         }
                     });
                 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Msg>
+    <AppHdr>
+        <CharSet>UTF-8</CharSet>
+        <Fr>
+            <AppIdr>DCOMNW</AppIdr>
+            <UsrIdr>CSDCSZ</UsrIdr>
+        </Fr>
+        <To>
+            <AppIdr>TEST</AppIdr>
+            <UsrIdr>ZJB0001</UsrIdr>
+        </To>
+        <BizMsgIdr>M20150813LIRP00000000001</BizMsgIdr>
+        <MsgDefIdr>V2.0</MsgDefIdr>
+        <BizSvc>LIRP</BizSvc>
+        <CreDt>2015-08-13T12:00:34</CreDt>
+        <Rltd>XXXX</Rltd>
+    </AppHdr>
+    <Document>
+        <UserName>TEST</UserName>
+        <VldtRst>0000</VldtRst>
+        <Desc>处理成功</Desc>
+    </Document>
+</Msg>
