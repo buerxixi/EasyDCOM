@@ -90,7 +90,7 @@ public class ClientFuture {
         Disposable disposable = EventBus.respPublish.subscribe(s -> {
 
             // 匹配发送id
-            if (XMLUtil.getBizMsgIdr(message).equals(XMLUtil.getBizMsgIdr(s))) {
+            if (XMLUtil.getBizMsgIdr(message).equals(XMLUtil.getRltd(s))) {
                 try {
                     process.process(s);
                 } catch (Exception e) {
@@ -104,7 +104,7 @@ public class ClientFuture {
         try {
             return future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new DCOMException(e.getMessage());
         } finally {
             // 取消订阅
             disposable.dispose();

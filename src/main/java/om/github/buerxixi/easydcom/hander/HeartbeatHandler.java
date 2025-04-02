@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.log4j.Log4j2;
+import om.github.buerxixi.easydcom.util.BizUtil;
 
 
 /**
@@ -28,7 +29,7 @@ public class HeartbeatHandler extends ChannelDuplexHandler {
             // 写空闲事件
         } else if (event.state() == IdleState.WRITER_IDLE) {
             // 发送心跳报文报文
-            ctx.channel().writeAndFlush("心跳报文");
+            ctx.channel().writeAndFlush(BizUtil.genHRBTXML());
 
             // // 非心跳事件，继续传递
         } else {

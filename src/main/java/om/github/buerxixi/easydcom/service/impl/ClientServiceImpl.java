@@ -61,11 +61,11 @@ public class ClientServiceImpl implements IClientService {
                     // 同步等待连接成功
                     .sync().channel();
             // 等待关闭
-            channel.closeFuture().sync();
+            channel.closeFuture().addListener(future -> {
+                group.shutdownGracefully();
+            });
         } catch (InterruptedException e) {
             log.error("连接失败", e);
-        } finally {
-            group.shutdownGracefully();
         }
     }
 

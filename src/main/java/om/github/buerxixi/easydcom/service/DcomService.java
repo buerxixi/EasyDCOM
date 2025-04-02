@@ -2,6 +2,8 @@ package om.github.buerxixi.easydcom.service;
 
 import om.github.buerxixi.easydcom.process.impl.ACKMPayloadProcess;
 import om.github.buerxixi.easydcom.process.impl.ControlPayloadProcess;
+import om.github.buerxixi.easydcom.util.BizUtil;
+import om.github.buerxixi.easydcom.util.XMLUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -15,21 +17,35 @@ public class DcomService {
 
     /**
      * 连接
-     * TODO:用户信息 Service端
-     * @param host    主机
-     * @param port    端口
-     * @param message 发送登录报文
+     *
+     * @param host     主机
+     * @param port     端口
+     * @param appIdr   应用系统标识符
+     * @param usrIdr   用户标识/用户名(UserName)
+     * @param password 密码
      */
-    public static synchronized String connect(String host, int port, String message) {
+    public static synchronized List<String> connect(String host, int port, String appIdr, String usrIdr, String password) {
+        return connect(host, port, appIdr, usrIdr, password, 0);
+    }
+
+    /**
+     * 连接
+     *
+     * @param host     主机
+     * @param port     端口
+     * @param appIdr   应用系统标识符
+     * @param usrIdr   用户标识/用户名(UserName)
+     * @param password 密码
+     * @param recvHB   回报条数
+     */
+    public static synchronized List<String> connect(String host, int port, String appIdr, String usrIdr, String password, Integer recvHB) {
 
         // 连接不会报错
         ClientFuture.connect(host, port);
 
         // 发送注销报文
-        ClientFuture.send(message, new ControlPayloadProcess());
-
-        // 发送报文
-        return null;
+        String LIRQXML = BizUtil.genLIRQXML(appIdr, usrIdr, password, recvHB);
+        return ClientFuture.send(LIRQXML, new ControlPayloadProcess());
     }
 
     /**
@@ -39,19 +55,18 @@ public class DcomService {
      */
     public static List<String> send(String message) {
 
-        // 发送注销报文
+        // 发送业务报文
         return ClientFuture.send(message, new ACKMPayloadProcess());
     }
 
     /**
      * 关闭连接
-     *
-     * @param message 发送登出报文
      */
-    public static synchronized void close(String message) {
+    public static synchronized void close() {
 
         // 发送注销报文
-        ClientFuture.send(message, new ControlPayloadProcess());
+        String LORQXML = BizUtil.genLORQXML();
+        ClientFuture.send(LORQXML, new ControlPayloadProcess());
 
         ClientFuture.close();
     }
