@@ -30,4 +30,10 @@ public class BizConstant {
      * 用户技术系统 <-> D-COM 网关
      */
     public final static String HRBT = "HRBT";
+
+    /**
+     * 确认报文
+     * D-COM 网关 -> 用户技术系统
+     */
+    public final static String ACKM = "ACKM";
 }

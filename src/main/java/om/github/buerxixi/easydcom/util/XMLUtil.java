@@ -1,29 +1,40 @@
 package om.github.buerxixi.easydcom.util;
 
 import lombok.extern.log4j.Log4j2;
+import om.github.buerxixi.easydcom.exception.DCOMException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
 import java.io.StringReader;
+import java.util.Optional;
 
 @Log4j2
 public class XMLUtil {
 
-    public static String getXPathValue(String xml, String xpathExpression) {
-        String value = "";
+    static public Optional<String> parse2Optional(String xml, String xpathExpression) {
         try {
             // 使用 SAXReader 解析 XML
             SAXReader reader = new SAXReader();
             Document document = reader.read(new StringReader(xml.trim()));
             Node node = document.selectSingleNode(xpathExpression);
-            value = node != null ? node.getText().trim() : null;
+            if (node != null) {
+                return Optional.of(node.getText().trim());
+            }
         } catch (DocumentException e) {
             log.error(e.getMessage(), e);
         }
+        return Optional.empty();
+    }
 
-        return value;
+    public static String parse2text(String xml, String xpathExpression) {
+        if (parse2Optional(xml, xpathExpression).isPresent()) {
+            return parse2Optional(xml, xpathExpression).get();
+        }
+        return "";
     }
 
     /**
@@ -33,7 +44,7 @@ public class XMLUtil {
      * @return 报文的标识符
      */
     public static String getBizMsgIdr(String xml) {
-        return getXPathValue(xml, "/Msg/AppHdr/BizMsgIdr");
+        return parse2text(xml, "/Msg/AppHdr/BizMsgIdr");
     }
 
     /**
@@ -43,7 +54,7 @@ public class XMLUtil {
      * @return 源报文的BizMsgIdr
      */
     public static String getRltd(String xml) {
-        return getXPathValue(xml, "/Msg/AppHdr/Rltd");
+        return parse2text(xml, "/Msg/AppHdr/Rltd");
     }
 
     /**
@@ -53,7 +64,27 @@ public class XMLUtil {
      * @return 业务类型标识符
      */
     public static String getBizSvc(String xml) {
-        return getXPathValue(xml, "/Msg/AppHdr/BizSvc");
+        return parse2text(xml, "/Msg/AppHdr/BizSvc");
+    }
+
+    /**
+     * 校验结果
+     *
+     * @param xml xml
+     * @return 校验结果
+     */
+    public static String getVldtRst(String xml) {
+        return parse2text(xml, "/Msg/Document/VldtRst");
+    }
+
+    /**
+     * 校验结果描述
+     *
+     * @param xml xml
+     * @return 校验结果描述
+     */
+    public static String getDesc(String xml) {
+        return parse2text(xml, "/Msg/Document/Desc");
     }
 
 }

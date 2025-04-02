@@ -1,8 +1,9 @@
 package om.github.buerxixi.easydcom.service;
 
-import om.github.buerxixi.easydcom.exception.DCOMException;
-import om.github.buerxixi.easydcom.service.impl.ClientServiceImpl;
+import om.github.buerxixi.easydcom.process.impl.ACKMPayloadProcess;
+import om.github.buerxixi.easydcom.process.impl.ControlPayloadProcess;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -10,8 +11,6 @@ import java.util.function.Consumer;
  * @since 2025/04/02 16:58
  */
 public class DcomService {
-
-
 
     /**
      * 连接
@@ -23,7 +22,10 @@ public class DcomService {
     public static synchronized String connect(String host, int port, String message) {
 
         // 连接不会报错
-        DcomServiceFuture.connect(host, port);
+        ClientFuture.connect(host, port);
+
+        // 发送注销报文
+        ClientFuture.send(message, new ControlPayloadProcess());
 
         // 发送报文
         return null;
@@ -34,9 +36,10 @@ public class DcomService {
      *
      * @param message 业务报文
      */
-    public static String send(String message) {
+    public static List<String> send(String message) {
 
-        return null;
+        // 发送注销报文
+        return ClientFuture.send(message, new ACKMPayloadProcess());
     }
 
     /**
@@ -46,19 +49,16 @@ public class DcomService {
      */
     public static synchronized void close(String message) {
 
-
         // 发送注销报文
-        DcomServiceFuture.send(message);
-        // 等待回应
-        // 关闭连接
+        ClientFuture.send(message, new ControlPayloadProcess());
 
-        DcomServiceFuture.close();
+        ClientFuture.close();
     }
 
     /**
      * 接受通知类消息
      */
     public static void receiveNotification(Consumer<String> consumer) {
-        DcomServiceFuture.receiveNotification(consumer);
+        ClientFuture.receiveNotification(consumer);
     }
 }
