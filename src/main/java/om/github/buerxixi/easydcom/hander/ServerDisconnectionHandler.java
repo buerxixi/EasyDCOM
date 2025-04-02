@@ -5,6 +5,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.extern.log4j.Log4j2;
+import om.github.buerxixi.easydcom.exception.DCOMException;
+import om.github.buerxixi.easydcom.pojo.EventMessage;
+import om.github.buerxixi.easydcom.service.EventBus;
 
 /**
  * 服务器断开
@@ -25,6 +28,7 @@ public class ServerDisconnectionHandler extends ChannelInboundHandlerAdapter {
 
         // channel断开
         log.error("服务端主动断开：{}", ctx.channel());
+        EventBus.eventPublish.onNext(new EventMessage(null, new DCOMException("服务端主动断开")));
         ctx.close().sync();
     }
 
@@ -32,6 +36,7 @@ public class ServerDisconnectionHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("服务端异常断开：{}，原因：{}", ctx.channel(), cause.getMessage());
+        EventBus.eventPublish.onNext(new EventMessage(null, cause));
         ctx.close().sync();
     }
 }

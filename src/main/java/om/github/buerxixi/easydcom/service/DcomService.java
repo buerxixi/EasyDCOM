@@ -11,8 +11,7 @@ import java.util.function.Consumer;
  */
 public class DcomService {
 
-    private static final IClientService clientService = new ClientServiceImpl();
-    private static Consumer<String> consumer = null;
+
 
     /**
      * 连接
@@ -22,12 +21,9 @@ public class DcomService {
      * @param message 发送登录报文
      */
     public static synchronized String connect(String host, int port, String message) {
-        if (clientService.isConnected()) {
-            // 连接已建立
-            throw new DCOMException("DCOM service is already connected");
-        }
-        clientService.connect(host, port);
-        clientService.send(message);
+
+        // 连接不会报错
+        DcomServiceFuture.connect(host, port);
         return null;
     }
 
@@ -37,11 +33,7 @@ public class DcomService {
      * @param message 业务报文
      */
     public static String send(String message) {
-        if (!clientService.isConnected()) {
-            throw new DCOMException("DCOM service is not connected");
-            // 连接已建立
-        }
-        clientService.send(message);
+
         return null;
     }
 
@@ -51,21 +43,20 @@ public class DcomService {
      * @param message 发送登出报文
      */
     public static synchronized void close(String message) {
-        if (!clientService.isConnected()) {
-            return;
-        }
+
 
         // 发送注销报文
-        clientService.send(message);
+        DcomServiceFuture.send(message);
         // 等待回应
         // 关闭连接
-        clientService.close();
+
+        DcomServiceFuture.close();
     }
 
     /**
      * 接受通知类消息
      */
     public static void receiveNotification(Consumer<String> consumer) {
-        DcomService.consumer = consumer;
+        DcomServiceFuture.receiveNotification(consumer);
     }
 }
