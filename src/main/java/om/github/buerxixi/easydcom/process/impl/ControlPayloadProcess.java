@@ -8,6 +8,8 @@ public class ControlPayloadProcess extends AbsPayloadProcess {
 
     @Override
     public void process(String s) {
-        this.fun.apply(new ArrayList<>());
+        ArrayList<String> list = new ArrayList<>();
+        list.add(s);
+        this.fun.apply(list);
     }
 }
