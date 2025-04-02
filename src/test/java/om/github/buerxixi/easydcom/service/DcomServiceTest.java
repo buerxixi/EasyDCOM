@@ -15,7 +15,14 @@ public class DcomServiceTest {
     }
 
     @Test
-    public void read1() {
+    public void read1OK() {
+        List<String> list = DcomService.connect("127.0.0.1", 7231, "TEST", "TEST", "12345678");
+        System.out.println(list);
+        DcomService.close();
+    }
+
+    @Test
+    public void read1ERROR() {
         List<String> list = DcomService.connect("127.0.0.1", 7231, "TEST", "TEST", "12345678");
         System.out.println(list);
         DcomService.close();

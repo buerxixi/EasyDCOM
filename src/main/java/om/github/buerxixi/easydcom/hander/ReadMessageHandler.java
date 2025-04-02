@@ -27,6 +27,8 @@ public class ReadMessageHandler extends SimpleChannelInboundHandler<String> {
                 return;
             }
 
+            log.info("service send xml={}",s);
+
             // 业务类报文
             String rltd = XMLUtil.getRltd(s); // 关联id
             if (StringUtils.isBlank(rltd)) { // 通知类
