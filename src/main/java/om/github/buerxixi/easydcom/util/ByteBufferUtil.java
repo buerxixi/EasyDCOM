@@ -4,6 +4,10 @@ import io.netty.util.internal.MathUtil;
 import io.netty.util.internal.StringUtil;
 import org.apache.commons.codec.binary.Hex;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -176,9 +180,20 @@ public class ByteBufferUtil {
     }
 
 
-    public static void main(String[] args) {
-        byte[] bytes = "123456789zxcvbnmasdfghjklqwertyuiop刘家强".getBytes(Charset.defaultCharset());
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        debugAll(buffer);
+    public static void main(String[] args) throws IOException {
+        String filename = "D://dbf_test/test6.dbf";
+        try (FileInputStream fis = new FileInputStream(filename);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                bos.write(buffer, 0, bytesRead);
+            }
+            byte[] bytes = bos.toByteArray();
+            ByteBuffer bufferObj = ByteBuffer.wrap(bytes);
+            debugAll(bufferObj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
