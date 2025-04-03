@@ -60,7 +60,7 @@ public class ClientFuture {
             future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("Failed to connect to DCOM", e);
-            throw new DCOMException("Connection to DCOM failed: " + e.getMessage());
+            throw new DCOMException("Connection to DCOM failed: " + e.getMessage(), e);
         } finally {
             disposable.dispose();
         }
@@ -94,7 +94,7 @@ public class ClientFuture {
             clientService.send(message);
             return future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new DCOMException("Failed to send message: " + e.getMessage());
+            throw new DCOMException("Failed to send message: " + e.getMessage(), e);
         } finally {
             disposable.dispose();
         }
