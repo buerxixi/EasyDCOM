@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * 读取消息
  *
- * @author <a href="mailto:EMAIL * @author <a href="mailto:liujiaqiang@outlook.com">Liujiaqiang</a>
+ * @author <a href="mailto:liujiaqiang@outlook.com">刘家强</a>
  * @since 2025/04/02 16:58
  */
 @Log4j2

@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * 消息解码器
  *
- * @author <a href="mailto:liujiaqiang@outlook.com">Liujiaqiang</a>
+ * @author <a href="mailto:liujiaqiang@outlook.com">刘家强</a>
  * @since 2025/04/02 16:58
  */
 @Log4j2

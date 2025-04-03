@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author <a href="mailto:liujiaqiang@outlook.com">Liujiaqiang</a>
+ * @author <a href="mailto:liujiaqiang@outlook.com">刘家强</a>
  * @since 2025/04/02 16:58
  */
 public class ProtocolFrameDecoder extends LengthFieldBasedFrameDecoder {

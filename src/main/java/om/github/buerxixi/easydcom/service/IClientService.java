@@ -1,7 +1,7 @@
 package om.github.buerxixi.easydcom.service;
 
 /**
- * @author <a href="mailto:liujiaqiang@outlook.com">Liujiaqiang</a>
+ * @author <a href="mailto:liujiaqiang@outlook.com">刘家强</a>
  * @since 2025/04/02 16:58
  */
 public interface IClientService {
