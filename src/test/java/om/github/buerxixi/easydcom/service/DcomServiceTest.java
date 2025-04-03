@@ -16,7 +16,6 @@ public class DcomServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Thread.sleep(10000);
     }
 
     @Test
