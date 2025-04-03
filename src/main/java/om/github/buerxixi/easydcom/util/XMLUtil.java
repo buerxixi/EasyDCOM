@@ -25,6 +25,7 @@ public class XMLUtil {
                 return Optional.of(node.getText().trim());
             }
         } catch (DocumentException e) {
+            log.error("error xml\n{}", xml);
             log.error(e.getMessage(), e);
         }
         return Optional.empty();
