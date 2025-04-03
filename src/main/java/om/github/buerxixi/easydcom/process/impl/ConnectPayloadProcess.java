@@ -3,27 +3,24 @@ package om.github.buerxixi.easydcom.process.impl;
 import io.reactivex.rxjava3.disposables.Disposable;
 import om.github.buerxixi.easydcom.process.AbsPayloadProcess;
 import om.github.buerxixi.easydcom.service.EventBus;
-import om.github.buerxixi.easydcom.util.XMLUtil;
-import java.util.Collections;
-import java.util.List;
 
-public class ControlPayloadProcess extends AbsPayloadProcess<List<String>> {
+public class ConnectPayloadProcess extends AbsPayloadProcess<Void> {
 
     private Disposable eventPublishDisposable;
-    private Disposable respPublishDisposable;
-    private String message;
 
+
+    @Override
+    public void process(String xml) {
+
+    }
 
     @Override
     protected void addFutureComplete() {
         eventPublishDisposable = EventBus.eventPublish.subscribe(eventMessage -> {
             if (eventMessage.getThrowable() != null) {
                 future.completeExceptionally(eventMessage.getThrowable());
-            }
-        });
-        respPublishDisposable = EventBus.respPublish.subscribe(xml -> {
-            if (XMLUtil.getBizMsgIdr(message).equals(XMLUtil.getRltd(xml))) {
-                future.complete(Collections.singletonList(xml));
+            } else {
+                future.complete(null);
             }
         });
     }
@@ -31,11 +28,5 @@ public class ControlPayloadProcess extends AbsPayloadProcess<List<String>> {
     @Override
     public void close() {
         eventPublishDisposable.dispose();
-        respPublishDisposable.dispose();
-    }
-
-    @Override
-    public void process(String message) {
-        this.message = message;
     }
 }

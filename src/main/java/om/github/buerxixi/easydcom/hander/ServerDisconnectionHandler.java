@@ -2,8 +2,6 @@ package om.github.buerxixi.easydcom.hander;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
 import lombok.extern.log4j.Log4j2;
 import om.github.buerxixi.easydcom.exception.DCOMException;
 import om.github.buerxixi.easydcom.pojo.EventMessage;

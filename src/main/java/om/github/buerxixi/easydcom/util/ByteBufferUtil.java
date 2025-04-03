@@ -2,14 +2,10 @@ package om.github.buerxixi.easydcom.util;
 
 import io.netty.util.internal.MathUtil;
 import io.netty.util.internal.StringUtil;
-import org.apache.commons.codec.binary.Hex;
-
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 public class ByteBufferUtil {
     private static final char[] BYTE2CHAR = new char[256];

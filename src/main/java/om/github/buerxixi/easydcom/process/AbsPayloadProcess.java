@@ -1,15 +1,22 @@
 package om.github.buerxixi.easydcom.process;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.concurrent.CompletableFuture;
 
-public abstract class AbsPayloadProcess {
+public abstract class AbsPayloadProcess<T> {
 
-    protected Function<List<String>, Boolean> fun;
+    protected CompletableFuture<T> future;
 
-    public abstract void process(String s);
+    public Runnable addFuture(CompletableFuture<T> future) {
+        this.future = future;
 
-    public void complete(Function<List<String>, Boolean> fun) {
-        this.fun = fun;
+        // 返回的数据 如果调用 会调用close方法
+        addFutureComplete();
+        return this::close;
     }
+
+    abstract protected void addFutureComplete();
+
+    abstract public void close();
+
+    abstract public void process(String message);
 }

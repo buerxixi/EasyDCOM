@@ -1,4 +1,5 @@
 package om.github.buerxixi.easydcom.exception;
+
 /**
  * 自定义 DCOM 异常类，继承自 RuntimeException。
  * 该类用于处理 DCOM 相关的异常情况。

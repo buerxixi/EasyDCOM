@@ -1,13 +1,11 @@
 package om.github.buerxixi.easydcom.service;
 
-import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.extern.log4j.Log4j2;
 import om.github.buerxixi.easydcom.exception.DCOMException;
 import om.github.buerxixi.easydcom.process.AbsPayloadProcess;
+import om.github.buerxixi.easydcom.process.impl.ConnectPayloadProcess;
 import om.github.buerxixi.easydcom.service.impl.ClientServiceImpl;
 import om.github.buerxixi.easydcom.util.DCOMConstant;
-import om.github.buerxixi.easydcom.util.XMLUtil;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,6 +23,7 @@ import java.util.function.Consumer;
 public class ClientFuture {
 
     private static final IClientService clientService = new ClientServiceImpl();
+
     private static Consumer<String> consumer = null;
 
     static {
@@ -47,14 +46,8 @@ public class ClientFuture {
         }
 
         CompletableFuture<Void> future = new CompletableFuture<>();
-        Disposable disposable = EventBus.eventPublish.subscribe(eventMessage -> {
-            if (eventMessage.getThrowable() != null) {
-                future.completeExceptionally(eventMessage.getThrowable());
-            } else {
-                future.complete(null);
-            }
-        });
-
+        ConnectPayloadProcess payloadProcess = new ConnectPayloadProcess();
+        Runnable closed = payloadProcess.addFuture(future);
         try {
             clientService.connect(host, port);
             future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
@@ -62,7 +55,7 @@ public class ClientFuture {
             log.error("Failed to connect to DCOM", e);
             throw new DCOMException("Connection to DCOM failed: " + e.getMessage(), e);
         } finally {
-            disposable.dispose();
+            closed.run();
         }
     }
 
@@ -72,23 +65,14 @@ public class ClientFuture {
      *
      * @param message 业务报文
      */
-    public static List<String> send(String message, AbsPayloadProcess process) {
+    public static List<String> send(String message, AbsPayloadProcess<List<String>> payloadProcess) {
         if (!clientService.isConnected()) {
             throw new DCOMException("DCOM service is not connected");
         }
 
         CompletableFuture<List<String>> future = new CompletableFuture<>();
-        process.complete(future::complete);
-
-        Disposable disposable = EventBus.respPublish.subscribe(s -> {
-            if (XMLUtil.getBizMsgIdr(message).equals(XMLUtil.getRltd(s))) {
-                try {
-                    process.process(s);
-                } catch (Exception e) {
-                    future.completeExceptionally(e);
-                }
-            }
-        });
+        payloadProcess.process(message);
+        Runnable closed = payloadProcess.addFuture(future);
 
         try {
             clientService.send(message);
@@ -96,7 +80,7 @@ public class ClientFuture {
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new DCOMException("Failed to send message: " + e.getMessage(), e);
         } finally {
-            disposable.dispose();
+            closed.run();
         }
     }
 
