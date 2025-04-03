@@ -43,7 +43,6 @@ public class ClientFuture {
      */
     public static synchronized void connect(String host, int port) {
         if (clientService.isConnected()) {
-            // 连接已建立
             throw new DCOMException("DCOM service is already connected");
         }
 
@@ -58,38 +57,30 @@ public class ClientFuture {
 
         try {
             clientService.connect(host, port);
+            future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("Failed to connect to DCOM", e);
-            throw new DCOMException(e.getMessage());
-        }
-
-        try {
-            future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new DCOMException("Connection to DCOM failed: " + e.getMessage());
         } finally {
-            // 取消订阅
             disposable.dispose();
         }
     }
 
     /**
      * 发送业务报文
-     * TODO:如果登录失败应该调佣close 此处需要业务侧来处理
+     * TODO: 如果登录失败应该调用 close 此处需要业务侧来处理
      *
      * @param message 业务报文
      */
     public static List<String> send(String message, AbsPayloadProcess process) {
         if (!clientService.isConnected()) {
             throw new DCOMException("DCOM service is not connected");
-            // 连接已建立
         }
-        CompletableFuture<List<String>> future = new CompletableFuture<>();
-        // 完成后的回调函数
-        process.complete(future::complete);
-        Disposable disposable = EventBus.respPublish.subscribe(s -> {
 
-            // 匹配发送id
+        CompletableFuture<List<String>> future = new CompletableFuture<>();
+        process.complete(future::complete);
+
+        Disposable disposable = EventBus.respPublish.subscribe(s -> {
             if (XMLUtil.getBizMsgIdr(message).equals(XMLUtil.getRltd(s))) {
                 try {
                     process.process(s);
@@ -99,14 +90,12 @@ public class ClientFuture {
             }
         });
 
-        clientService.send(message);
-
         try {
+            clientService.send(message);
             return future.get(DCOMConstant.SOCKET_TIMEOUT, TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new DCOMException(e.getMessage());
+            throw new DCOMException("Failed to send message: " + e.getMessage());
         } finally {
-            // 取消订阅
             disposable.dispose();
         }
     }
@@ -115,11 +104,9 @@ public class ClientFuture {
      * 关闭连接
      */
     public static synchronized void close() {
-        if (!clientService.isConnected()) {
-            return;
+        if (clientService.isConnected()) {
+            clientService.close();
         }
-
-        clientService.close();
     }
 
     /**

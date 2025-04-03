@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public class ACKMPayloadProcess extends AbsPayloadProcess {
 
-    private List<String> resp = new ArrayList<>();
+    // 将 resp 字段声明为 final
+    private final List<String> resp = new ArrayList<>();
 
     @Override
     public void process(String xml) {
