@@ -1,8 +1,11 @@
 package om.github.buerxixi.easydcom.hander;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.apache.commons.lang3.StringUtils;
+
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
@@ -22,7 +25,18 @@ public class ProtocolFrameDecoder extends LengthFieldBasedFrameDecoder {
     @Override
     protected long getUnadjustedFrameLength(ByteBuf buf, int offset, int length, ByteOrder order) {
         buf = buf.order(order);
+
+//        // 读取版本号（2字节）
+//        String version = buf.toString(0, 2, StandardCharsets.UTF_8);
+//        if (!"01".equals(version)) throw new CorruptedFrameException("Invalid version");
+//
+//        // 读取报文类型（3字节）
+//        String type = buf.toString(2, 3, StandardCharsets.UTF_8);
+//        if (!"XML".equals(type)) throw new CorruptedFrameException("Invalid type");
+
+        // 报文长度
         String frameLength = buf.toString(offset, length, StandardCharsets.UTF_8);
         return Integer.parseInt(StringUtils.trim(frameLength));
     }
+
 }

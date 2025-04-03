@@ -55,6 +55,8 @@ public class ClientServiceImpl implements IClientService {
                             );
                             // 读取消息报文
                             ch.pipeline().addLast(new ReadMessageHandler());
+                            // 异常处理
+                            // ch.pipeline().addLast(new ExceptionHandler());
                         }
                     })
                     .connect(host, port)
