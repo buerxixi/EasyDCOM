@@ -14,6 +14,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import om.github.buerxixi.easydcom.hander.MessageEncoder;
 import om.github.buerxixi.easydcom.hander.ProtocolFrameDecoder;
+import om.github.buerxixi.easydcom.util.BizConstant;
 import om.github.buerxixi.easydcom.util.XMLUtil;
 import org.junit.Test;
 import java.nio.charset.StandardCharsets;
@@ -83,10 +84,10 @@ public class SocketServiceTests {
                             bizSvc.ifPresent(service -> {
                                 String bizMsgIdr = s1.orElse("");
                                 switch (service) {
-                                    case "LIRQ":
+                                    case BizConstant.LIRQ:
                                         ctx.channel().writeAndFlush(LOGIN_RESP_TEMPLATE.replace("XXXX", bizMsgIdr));
                                         break;
-                                    case "LORQ":
+                                    case BizConstant.LORQ:
                                         ctx.channel().writeAndFlush(LOGOUT_RESP_TEMPLATE.replace("XXXX", bizMsgIdr));
                                         break;
                                     default:
