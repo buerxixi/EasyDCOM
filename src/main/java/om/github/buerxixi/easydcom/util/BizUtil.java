@@ -6,6 +6,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -169,6 +170,21 @@ public class BizUtil {
         return genAppHdr(BizConstant.LORQ, documentElem -> {
             documentElem.addElement("UserName").addText(appIdr);
             documentElem.addElement("Password").addText(password);
+        });
+    }
+
+    /**
+     * 注销请求报文
+     *
+     * @param rsnCd 注销原因
+     * @param desc  注销描述
+     */
+    public static String genLORQXML(String rsnCd, String desc) {
+        return genAppHdr(BizConstant.LORQ, documentElem -> {
+            documentElem.addElement("UserName").addText(appIdr);
+            documentElem.addElement("Password").addText(password);
+            documentElem.addElement("RsnCd").addText(password);
+            documentElem.addElement("Desc").addText(password);
         });
     }
 

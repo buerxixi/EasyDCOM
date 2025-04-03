@@ -11,6 +11,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.log4j.Log4j2;
+import om.github.buerxixi.easydcom.hander.ExceptionHandler;
 import om.github.buerxixi.easydcom.hander.HeartbeatHandler;
 import om.github.buerxixi.easydcom.hander.MessageEncoder;
 import om.github.buerxixi.easydcom.hander.ProtocolFrameDecoder;
@@ -56,7 +57,7 @@ public class ClientServiceImpl implements IClientService {
                             // 读取消息报文
                             ch.pipeline().addLast(new ReadMessageHandler());
                             // 异常处理
-                            // ch.pipeline().addLast(new ExceptionHandler());
+                            ch.pipeline().addLast(new ExceptionHandler());
                         }
                     })
                     .connect(host, port)
