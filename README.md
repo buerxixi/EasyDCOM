@@ -1,6 +1,10 @@
 # 基于深市登记结算 XML 实时报文接口规范（Ver 1.23）
 
 > [深市登记结算 XML 实时报文接口规范（Ver 1.23）](http://www.chinaclear.cn/zdjs/jszsc/202405/f25a16ec032b460d927cfe6628c15460/files/%E6%B7%B1%E5%B8%82%E7%99%BB%E8%AE%B0%E7%BB%93%E7%AE%97XML%E5%AE%9E%E6%97%B6%E6%8A%A5%E6%96%87%E6%8E%A5%E5%8F%A3%E8%A7%84%E8%8C%83%EF%BC%88Ver%201.23%EF%BC%89.pdf)
+> 
+> [D-COM网关用户手册](http://www.chinaclear.cn/zdjs/cszsc/201704/d79759b58ec146c88ed8e6f5d2a106cc/files/20170426091552503.pdf)
+> 
+> [PROP通用接口用户使用手册](http://www.chinaclear.cn/zdjs/cshsc/202008/0cd8f32c88c6403eac995d8b78876f36/files/20200804142514409.pdf)
 ### socket结构定义
 表12 报文说明数据块结构说明
 
